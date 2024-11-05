@@ -1,3 +1,4 @@
+import { Button } from "./_components/ui/button";
 
 
 export default function Home() {
@@ -5,7 +6,7 @@ export default function Home() {
   return (
 
     <div>
-      <h1 className="text-red-500 flex items-start justify-center size-4">Olaaa</h1>
+      <Button> Ola Mundo!</Button>
     </div>
   );
 }
