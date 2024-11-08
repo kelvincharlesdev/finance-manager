@@ -7,5 +7,6 @@ export default async function Home() {
   if (!userId) {
     redirect("/login");
   }
+
   return <NavBar />;
 }
