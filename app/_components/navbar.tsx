@@ -9,7 +9,7 @@ const NavBar = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="mx-auto flex max-w-[1440px] justify-between border-b border-solid px-8 py-4">
+    <nav className="mx-auto flex w-full max-w-[1440px] justify-between border-b border-solid px-8 py-4">
       <div className="flex items-center gap-10">
         <Image src="/logo.svg" alt="Finance Manager" width={173} height={39} />
         <Link
