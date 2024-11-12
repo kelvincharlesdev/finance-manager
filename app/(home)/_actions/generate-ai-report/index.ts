@@ -27,6 +27,7 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     return DUMMY_REPORT;
   }
+
   const transactions = await db.transaction.findMany({
     where: {
       createdAt: {
@@ -44,19 +45,26 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
     )
     .join(";")}`;
 
-  const completion = await openAi.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content:
-          "Você é um especialista em gestão e organização de finanças pessoais. Você ajuda as pessoas a organizarem melhor as suas finanças.",
-      },
-      {
-        role: "user",
-        content,
-      },
-    ],
-  });
-  return completion.choices[0].message.content;
+  try {
+    const start = Date.now();
+    const completion = await openAi.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Você é um especialista em gestão e organização de finanças pessoais. Você ajuda as pessoas a organizarem melhor as suas finanças.",
+        },
+        {
+          role: "user",
+          content,
+        },
+      ],
+    });
+    console.log(`OpenAI response time: ${Date.now() - start}ms`);
+    return completion.choices[0].message.content;
+  } catch (error) {
+    console.error("Error generating report:", error);
+    return DUMMY_REPORT; // Retornar um relatório simulado se ocorrer timeout
+  }
 };
