@@ -19,14 +19,14 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
     throw new Error("You need a premium plan to generate AI reports");
   }
 
-  const openAi = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-
   if (!process.env.OPENAI_API_KEY) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     return DUMMY_REPORT;
   }
+
+  const openAi = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
   const transactions = await db.transaction.findMany({
     where: {
@@ -45,26 +45,19 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
     )
     .join(";")}`;
 
-  try {
-    const start = Date.now();
-    const completion = await openAi.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "Você é um especialista em gestão e organização de finanças pessoais. Você ajuda as pessoas a organizarem melhor as suas finanças.",
-        },
-        {
-          role: "user",
-          content,
-        },
-      ],
-    });
-    console.log(`OpenAI response time: ${Date.now() - start}ms`);
-    return completion.choices[0].message.content;
-  } catch (error) {
-    console.error("Error generating report:", error);
-    return DUMMY_REPORT; // Retornar um relatório simulado se ocorrer timeout
-  }
+  const completion = await openAi.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content:
+          "Você é um especialista em gestão e organização de finanças pessoais. Você ajuda as pessoas a organizarem melhor as suas finanças.",
+      },
+      {
+        role: "user",
+        content,
+      },
+    ],
+  });
+  return completion.choices[0].message.content;
 };
