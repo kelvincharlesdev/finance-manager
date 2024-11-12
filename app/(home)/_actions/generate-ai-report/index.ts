@@ -4,7 +4,7 @@ import { db } from "@/app/_lib/prisma";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 import { GenerateAiReportSchema } from "./schema";
-// import { DUMMY_REPORT } from "./dummy-report";
+import { DUMMY_REPORT } from "./dummy-report";
 
 export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
   const { userId } = await auth();
@@ -23,10 +23,10 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  // if (!process.env.OPENAI_API_KEY) {
-  //   await new Promise((resolve) => setTimeout(resolve, 2000));
-  //   return DUMMY_REPORT;
-  // }
+  if (!process.env.OPENAI_API_KEY) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    return DUMMY_REPORT;
+  }
   const transactions = await db.transaction.findMany({
     where: {
       createdAt: {
@@ -40,11 +40,9 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
   ${transactions
     .map(
       (transaction) =>
-        `${new Date(transaction.date).toLocaleDateString("pt-BR")}-R$${transaction.amount}-${transaction.type}-${transaction.category}`,
+        `${transaction.date.toLocaleDateString("pt-BR")}-R$${transaction.amount}-${transaction.type}-${transaction.category}`,
     )
     .join(";")}`;
-
-  console.log("Conteúdo enviado para OpenAI:", content);
 
   const completion = await openAi.chat.completions.create({
     model: "gpt-4o-mini",
