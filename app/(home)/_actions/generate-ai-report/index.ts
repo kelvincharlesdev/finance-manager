@@ -40,9 +40,11 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
   ${transactions
     .map(
       (transaction) =>
-        `${transaction.date.toLocaleDateString("pt-BR")}-R$${transaction.amount}-${transaction.type}-${transaction.category}`,
+        `${new Date(transaction.date).toLocaleDateString("pt-BR")}-R$${transaction.amount}-${transaction.type}-${transaction.category}`,
     )
     .join(";")}`;
+
+  console.log("Conteúdo enviado para OpenAI:", content);
 
   const completion = await openAi.chat.completions.create({
     model: "gpt-4o-mini",
