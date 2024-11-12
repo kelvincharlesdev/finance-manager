@@ -4,7 +4,7 @@ import { db } from "@/app/_lib/prisma";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 import { GenerateAiReportSchema } from "./schema";
-import { DUMMY_REPORT } from "./dummy-report";
+// import { DUMMY_REPORT } from "./dummy-report";
 
 export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
   const { userId } = await auth();
@@ -19,15 +19,14 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
     throw new Error("You need a premium plan to generate AI reports");
   }
 
-  if (!process.env.OPENAI_API_KEY) {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    return DUMMY_REPORT;
-  }
-
   const openAi = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
 
+  // if (!process.env.OPENAI_API_KEY) {
+  //   await new Promise((resolve) => setTimeout(resolve, 2000));
+  //   return DUMMY_REPORT;
+  // }
   const transactions = await db.transaction.findMany({
     where: {
       createdAt: {
